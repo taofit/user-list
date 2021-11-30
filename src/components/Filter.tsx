@@ -1,12 +1,33 @@
-import React from 'react';
+import React, {ChangeEvent} from 'react';
 
 interface FilterProps {
+    filterName: (e: ChangeEvent<HTMLInputElement>) => void;
+    filterOffice: (e: ChangeEvent<HTMLInputElement>) => void;
     name: string;
-    office: string
+    office: string;
 }
 
-const Filter: ({name, office}: FilterProps) => void = ({name, office}: FilterProps) => {
-    return <div></div>;
+const Filter:React.FC<FilterProps> = ({filterName, filterOffice, name, office}: FilterProps) => {
+    const className = 'filter-input';
+
+    return <div>
+        <input
+            type="search"
+            value={name}
+            onChange={filterName}
+            placeholder="Filter name"
+            name="name"
+            className={className}
+        />
+        <input
+            type="search"
+            value={office}
+            onChange={filterOffice}
+            placeholder="Filter office"
+            name="office"
+            className={className}
+        />
+    </div>;
 }
 
 export default Filter;

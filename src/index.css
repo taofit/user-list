@@ -35,3 +35,6 @@ code {
 .user-profile span {
   display: inline-block;
 }
+.filter-input {
+  margin: auto 10px;
+}
