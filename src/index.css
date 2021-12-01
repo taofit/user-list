@@ -38,3 +38,12 @@ code {
 .filter-input {
   margin: auto 10px;
 }
+.user-page img {
+  width: 50%;
+}
+.user-page {
+  padding: 20px;
+}
+.user-page .main-text {
+  margin: 20px 0;
+}

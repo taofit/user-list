@@ -82,7 +82,7 @@ const List = () => {
         setProcessedUsers(sorted);
     }, [sortType]);
 
-    return <div>
+    return <div className="App">
         <h4>{title}</h4>
         <Filter filterName={filterName} filterOffice={filterOffice} name={name} office={office}/>
         <Sort setSortType={setType} />
