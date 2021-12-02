@@ -11,11 +11,12 @@ const twitter = 'https://twitter.com/';
 const github = 'https://github.com/';
 
 const DataGrid: React.FC<DataGridProps> = ({user}: DataGridProps) => {
+    const userName = user.name.replace(' ', '-');
 
     return <li className="user-profile">
             <Link
                 to={{
-                    pathname: "user",
+                    pathname: `user/${userName}`,
                 }}
                 state={{
                     user

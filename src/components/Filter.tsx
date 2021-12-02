@@ -15,7 +15,7 @@ const Filter:React.FC<FilterProps> = ({filterName, filterOffice, name, office}: 
             type="search"
             value={name}
             onChange={filterName}
-            placeholder="Filter name"
+            placeholder="Search by name"
             name="name"
             className={className}
         />
@@ -23,7 +23,7 @@ const Filter:React.FC<FilterProps> = ({filterName, filterOffice, name, office}: 
             type="search"
             value={office}
             onChange={filterOffice}
-            placeholder="Filter office"
+            placeholder="Search by office"
             name="office"
             className={className}
         />

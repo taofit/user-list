@@ -3,6 +3,7 @@ import { LoadUsers } from "./API";
 import DataGrid from './DataGrid';
 import Filter from './Filter';
 import Sort from './Sort';
+import { Controller, Scene } from 'react-scrollmagic';
 
 export interface User {
     name: string;
@@ -22,12 +23,16 @@ export interface User {
     twitter: string | null
 }
 
+const GRID = 'container-grid';
+const FLEX = 'container-flex';
+
 const List = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [processedUsers, setProcessedUsers] = useState<User[]>([]);
     const [sortType, setSortType] = useState('');
     const [name, setName] = useState('');
     const [office, setOffice] = useState('');
+    const [layoutClassName, setLayoutClassName] = useState(GRID);
     const title = 'Profile List';
 
     const filterName = (e: ChangeEvent<HTMLInputElement>) => {
@@ -77,18 +82,35 @@ const List = () => {
         setSortType(e.target.value);
     };
 
+    const switchView = () => {
+        setLayoutClassName(layoutClassName === GRID ? FLEX : GRID);
+    };
+
+    const ViewMode = () => (
+        <div>
+            View by:
+            <button onClick={switchView} className={layoutClassName === GRID ? 'highlight' : ''}>Grid</button>
+            <button onClick={switchView} className={layoutClassName === FLEX ? 'highlight' : ''}>Flex</button>
+        </div>
+    )
+
     useEffect(() => {
         const sorted = [...users].sort((userA, userB) => compareObjects(userA, userB, sortType));
         setProcessedUsers(sorted);
     }, [sortType]);
 
-    return <div className="App">
+    return <div>
         <h4>{title}</h4>
+        <ViewMode />
         <Filter filterName={filterName} filterOffice={filterOffice} name={name} office={office}/>
         <Sort setSortType={setType} />
-        <ul className="container">
-            {processedUsers.map((user, index) => <DataGrid user={user} key={index}/>)}
-        </ul>
+        <Controller>
+            <Scene duration={600} pin>
+                <ul className={layoutClassName}>
+                    {processedUsers.map((user, index) => <DataGrid user={user} key={index}/>)}
+                </ul>
+            </Scene>
+        </Controller>
     </div>;
 }
 
