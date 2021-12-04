@@ -1,7 +1,7 @@
-import React, {ChangeEvent} from 'react';
+import React from 'react';
 
 interface SortProps {
-    setSortType: (e: ChangeEvent<HTMLSelectElement>) => void;
+    setSortType: (value: string) => void;
 }
 
 const sortTypes = ['name', 'office'];
@@ -11,7 +11,7 @@ const Sort: React.FC<SortProps> = ({setSortType}: SortProps) => {
         <div className="sort-by">
             <label>Sort by:</label>
             <select
-                onChange={setSortType}
+                onChange={(e) => setSortType(e.target.value)}
             >
                 {sortTypes.map((type, index) => <option key={index} value={type}>{type}</option>)}
             </select>

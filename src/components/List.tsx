@@ -3,6 +3,7 @@ import { LoadUsers } from "./API";
 import DataGrid from './DataGrid';
 import Filter from './Filter';
 import Sort from './Sort';
+import InfiniteScroll from './InfiniteScroll';
 
 export interface User {
     name: string;
@@ -27,12 +28,9 @@ const FLEX = 'container-flex';
 
 const List = () => {
     const [users, setUsers] = useState<User[]>([]);
-    const pageSize = 30;
-    const startIndex = 0;
+    const [fetchedUsers, setFetchedUsers] = useState<User[]>([]);
+    const [fetchedAndFilteredUsers, setFetchedAndFilteredUsers] = useState<User[]>([]);
     const [isFetching, setIsFetching] = useState(false);
-    const [endIndex, setEndIndex] = useState(startIndex + pageSize);
-    const [processedUsers, setProcessedUsers] = useState<User[]>([]);
-    const [loadedUsers, setLoadedUsers] = useState<User[]>([]);
     const [sortType, setSortType] = useState('');
     const [name, setName] = useState('');
     const [office, setOffice] = useState('');
@@ -42,9 +40,9 @@ const List = () => {
     const filterName = (e: ChangeEvent<HTMLInputElement>) => {
         const searchNameString = e.target.value.toLowerCase();
         if (searchNameString !== '') {
-            setProcessedUsers(users.filter((user) => user.name?.toLowerCase().includes(searchNameString)));
+            setFetchedAndFilteredUsers(fetchedUsers.filter((user) => user.name?.toLowerCase().includes(searchNameString)));
         } else {
-            setProcessedUsers(users);
+            setFetchedAndFilteredUsers(fetchedUsers);
         }
 
         setName(searchNameString);
@@ -53,9 +51,9 @@ const List = () => {
     const filterOffice = (e: ChangeEvent<HTMLInputElement>) => {
         const searchOfficeString = e.target.value.toLowerCase();
         if (searchOfficeString !== '') {
-            setProcessedUsers(users.filter((user) => user.office?.toLowerCase().includes(searchOfficeString)));
+            setFetchedAndFilteredUsers(fetchedUsers.filter((user) => user.office?.toLowerCase().includes(searchOfficeString)));
         } else {
-            setProcessedUsers(users);
+            setFetchedAndFilteredUsers(fetchedUsers);
         }
 
         setOffice(searchOfficeString);
@@ -74,9 +72,6 @@ const List = () => {
         }
         return 0
     }
-    const setType = (e: ChangeEvent<HTMLSelectElement>) => {
-        setSortType(e.target.value);
-    };
 
     const switchView = () => {
         setLayoutClassName(layoutClassName === GRID ? FLEX : GRID);
@@ -89,54 +84,28 @@ const List = () => {
             <button onClick={switchView} className={layoutClassName === FLEX ? 'highlight' : ''}>Flex</button>
         </div>
     )
-    const fetchUsers = () => {
-        const currentUsers = users.slice(startIndex, endIndex);
-        setEndIndex(endIndex + pageSize);
-        setLoadedUsers(currentUsers);
-    };
 
-    const handleScroll = () => {
-        if (Math.ceil(window.innerHeight + document.documentElement.scrollTop) < document.documentElement.offsetHeight
-            || isFetching) {
-            return;
-        }
-        setIsFetching(true);
-    };
+    InfiniteScroll(users, setFetchedAndFilteredUsers, setFetchedUsers, setIsFetching, isFetching);
 
     useEffect(() => {
-        if (isFetching) {
-            fetchUsers();
-            setIsFetching(false);
-        }
-    }, [isFetching]);
-
-    useEffect(() => {
-        const sorted = [...users].sort((userA, userB) => compareObjects(userA, userB, sortType));
-        setProcessedUsers(sorted);
+        const sorted = [...fetchedUsers].sort((userA, userB) => compareObjects(userA, userB, sortType));
+        setFetchedAndFilteredUsers(sorted);
     }, [sortType]);
 
     useEffect(() => {
         LoadUsers().then((data) => {
             setUsers(data);
-            setProcessedUsers(data);
             console.log(data);
         });
     }, []);
-
-    useEffect(() => {
-        if (!!users.length) {
-            fetchUsers();
-            window.addEventListener('scroll', handleScroll);
-        }
-    }, [users]);
 
     return <div>
         <h4>{title}</h4>
         <ViewMode />
         <Filter filterName={filterName} filterOffice={filterOffice} name={name} office={office}/>
-        <Sort setSortType={setType} />
+        <Sort setSortType={setSortType} />
         <ul className={layoutClassName}>
-            {loadedUsers.map((user, index) => <DataGrid user={user} key={index}/>)}
+            {fetchedAndFilteredUsers.map((user, index) => <DataGrid user={user} key={index}/>)}
         </ul>
         {isFetching && <h1>Fetching more users...</h1>}
     </div>;
