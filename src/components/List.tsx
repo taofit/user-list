@@ -3,7 +3,6 @@ import { LoadUsers } from "./API";
 import DataGrid from './DataGrid';
 import Filter from './Filter';
 import Sort from './Sort';
-import { Controller, Scene } from 'react-scrollmagic';
 
 export interface User {
     name: string;
@@ -28,7 +27,12 @@ const FLEX = 'container-flex';
 
 const List = () => {
     const [users, setUsers] = useState<User[]>([]);
+    const pageSize = 30;
+    const startIndex = 0;
+    const [isFetching, setIsFetching] = useState(false);
+    const [endIndex, setEndIndex] = useState(startIndex + pageSize);
     const [processedUsers, setProcessedUsers] = useState<User[]>([]);
+    const [loadedUsers, setLoadedUsers] = useState<User[]>([]);
     const [sortType, setSortType] = useState('');
     const [name, setName] = useState('');
     const [office, setOffice] = useState('');
@@ -56,14 +60,6 @@ const List = () => {
 
         setOffice(searchOfficeString);
     };
-
-    useEffect(() => {
-        LoadUsers().then((data) => {
-            setUsers(data);
-            setProcessedUsers(data);
-            console.log(data);
-        });
-    }, []);
 
     const compareObjects = (object1: User, object2: User, key: string) => {
         if (key !== 'name' && key !== 'office') return 0;
@@ -93,24 +89,56 @@ const List = () => {
             <button onClick={switchView} className={layoutClassName === FLEX ? 'highlight' : ''}>Flex</button>
         </div>
     )
+    const fetchUsers = () => {
+        const currentUsers = users.slice(startIndex, endIndex);
+        setEndIndex(endIndex + pageSize);
+        setLoadedUsers(currentUsers);
+    };
+
+    const handleScroll = () => {
+        if (Math.ceil(window.innerHeight + document.documentElement.scrollTop) < document.documentElement.offsetHeight
+            || isFetching) {
+            return;
+        }
+        setIsFetching(true);
+    };
+
+    useEffect(() => {
+        if (isFetching) {
+            fetchUsers();
+            setIsFetching(false);
+        }
+    }, [isFetching]);
 
     useEffect(() => {
         const sorted = [...users].sort((userA, userB) => compareObjects(userA, userB, sortType));
         setProcessedUsers(sorted);
     }, [sortType]);
 
+    useEffect(() => {
+        LoadUsers().then((data) => {
+            setUsers(data);
+            setProcessedUsers(data);
+            console.log(data);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!!users.length) {
+            fetchUsers();
+            window.addEventListener('scroll', handleScroll);
+        }
+    }, [users]);
+
     return <div>
         <h4>{title}</h4>
         <ViewMode />
         <Filter filterName={filterName} filterOffice={filterOffice} name={name} office={office}/>
         <Sort setSortType={setType} />
-        <Controller>
-            <Scene duration={600} pin>
-                <ul className={layoutClassName}>
-                    {processedUsers.map((user, index) => <DataGrid user={user} key={index}/>)}
-                </ul>
-            </Scene>
-        </Controller>
+        <ul className={layoutClassName}>
+            {loadedUsers.map((user, index) => <DataGrid user={user} key={index}/>)}
+        </ul>
+        {isFetching && <h1>Fetching more users...</h1>}
     </div>;
 }
 
