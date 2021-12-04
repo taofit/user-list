@@ -1,9 +1,10 @@
 import React, {ChangeEvent, useEffect, useState} from 'react';
-import { LoadUsers } from "./API";
+import LoadUsers from './API';
 import DataGrid from './DataGrid';
 import Filter from './Filter';
 import Sort from './Sort';
 import InfiniteScroll from './InfiniteScroll';
+import { CompareObjects } from '../helpers/helper';
 
 export interface User {
     name: string;
@@ -27,7 +28,7 @@ const GRID = 'container-grid';
 const FLEX = 'container-flex';
 
 const List = () => {
-    const [users, setUsers] = useState<User[]>([]);
+    const [allUsers, setAllUsers] = useState<User[]>([]);
     const [fetchedUsers, setFetchedUsers] = useState<User[]>([]);
     const [fetchedAndFilteredUsers, setFetchedAndFilteredUsers] = useState<User[]>([]);
     const [isFetching, setIsFetching] = useState(false);
@@ -59,44 +60,28 @@ const List = () => {
         setOffice(searchOfficeString);
     };
 
-    const compareObjects = (object1: User, object2: User, key: string) => {
-        if (key !== 'name' && key !== 'office') return 0;
-        const obj1 = object1[key].toUpperCase()
-        const obj2 = object2[key].toUpperCase()
-
-        if (obj1 < obj2) {
-            return -1
-        }
-        if (obj1 > obj2) {
-            return 1
-        }
-        return 0
-    }
-
-    const switchView = () => {
-        setLayoutClassName(layoutClassName === GRID ? FLEX : GRID);
-    };
-
-    const ViewMode = () => (
+    const ViewMode: React.FC = () => (
         <div>
             View by:
-            <button onClick={switchView} className={layoutClassName === GRID ? 'highlight' : ''}>Grid</button>
-            <button onClick={switchView} className={layoutClassName === FLEX ? 'highlight' : ''}>Flex</button>
+            <button onClick={() => setLayoutClassName(GRID)} className={layoutClassName === GRID ? 'highlight' : ''}>Grid</button>
+            <button onClick={() => setLayoutClassName(FLEX)} className={layoutClassName === FLEX ? 'highlight' : ''}>Flex</button>
         </div>
     )
 
-    InfiniteScroll(users, setFetchedAndFilteredUsers, setFetchedUsers, setIsFetching, isFetching);
+    InfiniteScroll(allUsers, setFetchedAndFilteredUsers, setFetchedUsers, setIsFetching, isFetching);
 
     useEffect(() => {
-        const sorted = [...fetchedUsers].sort((userA, userB) => compareObjects(userA, userB, sortType));
+        const sorted = [...fetchedUsers].sort((userA, userB) => CompareObjects(userA, userB, sortType));
         setFetchedAndFilteredUsers(sorted);
     }, [sortType]);
 
     useEffect(() => {
+        // set a clean up flag
+        let isSubscribed = true;
         LoadUsers().then((data) => {
-            setUsers(data);
-            console.log(data);
+            setAllUsers(data);
         });
+        return () => {isSubscribed = false};
     }, []);
 
     return <div>
@@ -105,9 +90,16 @@ const List = () => {
         <Filter filterName={filterName} filterOffice={filterOffice} name={name} office={office}/>
         <Sort setSortType={setSortType} />
         <ul className={layoutClassName}>
-            {fetchedAndFilteredUsers.map((user, index) => <DataGrid user={user} key={index}/>)}
+            {fetchedAndFilteredUsers.map((user, index, elements) => {
+                const nextIndex = index < elements.length - 1 ? index + 1 : null;
+                const lastIndex = index === 0 ? null : index - 1;
+
+                const nextUser = nextIndex !== null ? elements[nextIndex] : null;
+                const lastUser = lastIndex !== null ? elements[lastIndex] : null;
+                return <DataGrid user={user} key={index} lastUser={lastUser} nextUser={nextUser}/>
+            })}
         </ul>
-        {isFetching && <h1>Fetching more users...</h1>}
+        {isFetching && <h3>Fetching more users...</h3>}
     </div>;
 }
 

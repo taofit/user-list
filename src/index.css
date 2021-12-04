@@ -30,7 +30,7 @@ code {
   padding: 5px;
   margin: 10px;
   font-size: 15px;
-  test-align: center;
+  text-align: center;
 }
 
 .container-grid .user-profile {
@@ -60,11 +60,31 @@ code {
 }
 .user-page .main-text {
   margin: 20px 0;
+  text-align: justify;
+}
+.user-page .last-user {
+  float: left;
+}
+.user-page .last-user img,
+.user-page .next-user img {
+  margin: auto auto auto 10px
+}
+.user-page .next-user {
+  float: right;
+}
+
+button {
+  cursor: pointer;
 }
 button,
 .sort-by {
   margin: 5px;
 }
 .highlight {
-  background-color: #80C565;
+  background-color: #002B55;
+  color: #fff;
+}
+.user-profile .sm_icon img {
+  width: 18px;
+  margin: 5px;
 }
