@@ -1,3 +1,9 @@
+# User profile list
+
+This App displays a list of users/employees, and show each user's detail in their individual page.
+it includes some features such as infinity scroll, sort, search, multi view mode, social media link, previous and next users link etc.
+some tests are also implemented. main language is typescript, framework is ReactJs.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
