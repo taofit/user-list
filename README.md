@@ -2,7 +2,7 @@
 
 This App displays a list of users/employees, and show each user's detail in their individual page.
 it includes some features such as infinity scroll, sort, search, multi view mode, social media link, previous and next users link etc.
-some tests are also implemented. main language is typescript, framework is ReactJs.
+Some tests are also implemented. Main language is typescript, framework is ReactJs.
 
 It will show the user-friendly message accordingly, such as loading sign, no search result message, or when user avatar is missing, it will be replaced with an image placeholder etc.
 
