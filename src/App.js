@@ -1,5 +1,5 @@
 import './App.css';
-import List from './components/List';
+import Main from './components/Main';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import UserProfile from "./components/UserPropfile";
 import React from "react";
@@ -9,7 +9,7 @@ function App() {
       <div className="App">
           <BrowserRouter>
               <Routes>
-                  <Route path="/" element={<List />} />
+                  <Route path="/" element={<Main />} />
                   <Route path="user/:username" element={<UserProfile />} />
               </Routes>
           </BrowserRouter>

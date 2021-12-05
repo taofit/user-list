@@ -1,4 +1,4 @@
-import {User} from "../components/List";
+import {User} from "../components/Main";
 
 export const CompareObjects = (object1: User, object2: User, key: string) => {
     if (key !== 'name' && key !== 'office') return 0;

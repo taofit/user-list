@@ -1,6 +1,6 @@
 import React from 'react';
 import {Link, useLocation} from 'react-router-dom';
-import { User } from './List';
+import { User } from './Main';
 import { HtmlToText } from '../helpers/helper';
 
 interface NeighbourUserProps {

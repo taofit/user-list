@@ -17,11 +17,15 @@ code {
   grid-template-columns: auto auto auto auto auto;
   padding: 10px;
   grid-auto-flow: row;
+  max-width: 80%;
+  margin: 0 auto;
 }
 
 .container-flex {
   display: flex;
   flex-wrap: wrap;
+  max-width: 80%;
+  margin: 0 auto;
 }
 
 .container-flex .user-profile {
@@ -47,7 +51,7 @@ code {
 }
 
 .user-profile span {
-  display: inline-block;
+  display: block;
 }
 .filter-input {
   margin: auto 10px;

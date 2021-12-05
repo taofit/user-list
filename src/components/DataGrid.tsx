@@ -1,5 +1,5 @@
 import React from 'react';
-import { User } from './List';
+import { User } from './Main';
 import { Link } from 'react-router-dom';
 
 const GITHUBPATH = './svg/github_icon.svg';
@@ -34,7 +34,7 @@ const DataGrid: React.FC<DataGridProps> = ({user, lastUser, nextUser}: DataGridP
             >
                 <img src={userAvatar} />
             </Link>
-            <span className="caption">
+            <span>
                 <span>{user.name}</span>
                 <span>Office: {user.office}</span>
             </span>

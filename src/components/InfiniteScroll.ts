@@ -1,12 +1,15 @@
 import {useEffect, useState} from "react";
-import {User} from "./List";
+import {User} from "./Main";
 
 const InfiniteScroll = (
     users: User[],
+    fetchedUsers: User[],
     setFetchedAndFilteredUsers: (users: User[]) => void,
     setFetchedUsers: (users: User[]) => void,
     setIsFetching: (fetching: boolean) => void,
-    isFetching: boolean
+    isFetching: boolean,
+    setIsLoading: (loading: boolean) => void,
+    setEndOfPage: (end: boolean) => void
 ) => {
     const pageSize = 30;
     const startIndex = 0;
@@ -14,9 +17,14 @@ const InfiniteScroll = (
 
     const fetchUsers = () => {
         const currentUsers = users.slice(startIndex, endIndex);
+        if (currentUsers.length === fetchedUsers.length) {
+            setEndOfPage(true);
+            return;
+        };
         setEndIndex(endIndex + pageSize);
         setFetchedUsers(currentUsers);
         setFetchedAndFilteredUsers(currentUsers);
+        setIsLoading(false);
     };
 
     const handleScroll = () => {

@@ -1,10 +1,10 @@
 import React, {ChangeEvent, useEffect, useState} from 'react';
 import LoadUsers from './API';
-import DataGrid from './DataGrid';
 import Filter from './Filter';
 import Sort from './Sort';
 import InfiniteScroll from './InfiniteScroll';
 import { CompareObjects } from '../helpers/helper';
+import UserList from './UserList';
 
 export interface User {
     name: string;
@@ -27,11 +27,13 @@ export interface User {
 const GRID = 'container-grid';
 const FLEX = 'container-flex';
 
-const List = () => {
+const Main = () => {
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [fetchedUsers, setFetchedUsers] = useState<User[]>([]);
     const [fetchedAndFilteredUsers, setFetchedAndFilteredUsers] = useState<User[]>([]);
     const [isFetching, setIsFetching] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [endOfPage, setEndOfPage] = useState(false);
     const [sortType, setSortType] = useState('');
     const [name, setName] = useState('');
     const [office, setOffice] = useState('');
@@ -68,7 +70,22 @@ const List = () => {
         </div>
     )
 
-    InfiniteScroll(allUsers, setFetchedAndFilteredUsers, setFetchedUsers, setIsFetching, isFetching);
+    const DisplayMsg:React.FC = () => {
+        const msg = [];
+        if (!fetchedAndFilteredUsers.length && isLoading) {
+            msg.push('Loading...');
+        }
+        if (!fetchedAndFilteredUsers.length && !isLoading) {
+            msg.push('No result');
+        }
+        if (isFetching && !endOfPage) {
+            msg.push('Fetching more users...');
+        }
+
+        return <div>{msg.map((item,index) => <h3 key={index}>{item}</h3>)}</div>;
+    };
+
+    InfiniteScroll(allUsers, fetchedUsers, setFetchedAndFilteredUsers, setFetchedUsers, setIsFetching, isFetching, setIsLoading, setEndOfPage);
 
     useEffect(() => {
         const sorted = [...fetchedUsers].sort((userA, userB) => CompareObjects(userA, userB, sortType));
@@ -80,27 +97,21 @@ const List = () => {
         let isSubscribed = true;
         LoadUsers().then((data) => {
             setAllUsers(data);
+            // console.log(data);
         });
         return () => {isSubscribed = false};
     }, []);
 
-    return <div>
-        <h4>{title}</h4>
-        <ViewMode />
-        <Filter filterName={filterName} filterOffice={filterOffice} name={name} office={office}/>
-        <Sort setSortType={setSortType} />
-        <ul className={layoutClassName}>
-            {fetchedAndFilteredUsers.map((user, index, elements) => {
-                const nextIndex = index < elements.length - 1 ? index + 1 : null;
-                const lastIndex = index === 0 ? null : index - 1;
-
-                const nextUser = nextIndex !== null ? elements[nextIndex] : null;
-                const lastUser = lastIndex !== null ? elements[lastIndex] : null;
-                return <DataGrid user={user} key={index} lastUser={lastUser} nextUser={nextUser}/>
-            })}
-        </ul>
-        {isFetching && <h3>Fetching more users...</h3>}
-    </div>;
+    return (
+        <div>
+            <h4>{title}</h4>
+            <ViewMode/>
+            <Filter filterName={filterName} filterOffice={filterOffice} name={name} office={office} />
+            <Sort setSortType={setSortType} />
+            <UserList fetchedAndFilteredUsers={fetchedAndFilteredUsers} layoutClassName={layoutClassName} />
+            <DisplayMsg />
+        </div>
+    );
 }
 
-export default List;
+export default Main;
